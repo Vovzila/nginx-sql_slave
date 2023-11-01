@@ -11,7 +11,7 @@ echo ubuntu321 | realm join -U ubuntu bis.vrn.ru
 sleep 10
 mount.cifs //192.168.100.3/"Общая шара" /mnt/windir -o username=ubuntu,password=ubuntu321
 sleep 10
-cp /home/vovzila/nginx-sql_slave/mysqld.cnf /etc/myql/mysql.conf.d/mysqld.cnf
+cp /home/vovzila/nginx-sql_slave/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
 systemctl restart mysql
 var1=$(head /mnt/windir/binlog)
 var2=$(head /mnt/windir/position)
