@@ -1,0 +1,40 @@
+git config --global user.name Vovzila
+git config --global user.email vovzila@mail.ru
+git clone https://vovzila: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@github.com/Vovzila/nginx-sql_slave.git
+cp /home/vovzila/apache-prometheus/timesyncd.conf /etc/systemd/timesyncd.conf
+wait
+systemctl restart systemd-timesyncd
+mkdir /mnt/windir
+wait
+cp /home/vovzila/apache-prometheus/realmd.conf /etc/realmd.conf
+echo ubuntu321 | realm join -U ubuntu bis.vrn.ru
+sleep 10
+mount.cifs //192.168.100.3/"Общая шара" /mnt/windir -o username=ubuntu,password=ubuntu321
+sleep 10
+cp /home/vovzila/mysqld.cnf /etc/myql/mysql.conf.d/mysqld.cnf
+systemctl restart mysql
+var1=$(head /mnt/windir/binlog)
+var2=$(head /mnt/windir/position)
+mysql -e "STOP SLAVE;"
+mysql -e "CHANGE MASTER TO MASTER_HOST='192.168.100.199', MASTER_USER='replica', MASTER_PASSWORD='replicA&20', MASTER_LOG_FILE='$var1', MASTER_LOG_POS=$var2, GET_MASTER_PUBLIC_KEY = 1;"
+mysql -e "START SLAVE;"
+chmod 755 /home/vovzila/cronboot
+cp /home/vovzila/default /etc/nginx/sites-available/default
+cp /home/vovzila/fileshare /etc/nginx/sites-available/fileshare
+ln -s /etc/nginx/sites-available/fileshare /etc/nginx/sites-enabled/fileshare
+systemctl restart nginx
+cd /home/vovzila/
+wait
+cp /mnt/windir/project/node_exporter-1.6.1.linux-amd64.tar.gz /home/vovzila/node_exporter-1.6.1.linux-amd64.tar.gz
+wait
+tar xzvf node_exporter-*.t*gz
+wait
+useradd --no-create-home --shell /bin/false node_exporter
+cp node_exporter-*.linux-amd64/node_exporter /usr/local/bin
+wait
+chown node_exporter: /usr/local/bin/node_exporter
+cp /home/vovzila/node_exporter.service /etc/systemd/system/node_exporter.service
+wait
+systemctl daemon-reload
+systemctl start node_exporter
+systemctl enable node_exporter

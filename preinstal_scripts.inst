@@ -1,0 +1,9 @@
+apt update
+apt -y upgrade
+apt -y install realmd sssd sssd-tools libnss-sss libpam-sss adcli samba-common-bin oddjob oddjob-mkhomedir packagekit
+apt-get install cifs-utils -y
+apt -y install git
+apt -y install mc
+apt -y install mysql-server
+mysql_secure_installation
+apt -y install nginx
