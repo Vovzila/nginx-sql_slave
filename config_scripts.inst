@@ -41,3 +41,5 @@ wait
 systemctl daemon-reload
 systemctl start node_exporter
 systemctl enable node_exporter
+rm -r node_exporter-1.6.1.linux-amd64
+rm node_exporter-1.6.1.linux-amd64.tar.gz
