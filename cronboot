@@ -1,0 +1,1 @@
+echo raMMste1321 | mount.cifs //192.168.100.3/"Общая шара" /mnt/windir -o username=vovzila,password=raMMste1321
