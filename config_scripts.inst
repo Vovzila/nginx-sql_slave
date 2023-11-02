@@ -19,6 +19,7 @@ mysql -e "STOP SLAVE;"
 mysql -e "CHANGE MASTER TO MASTER_HOST='192.168.100.199', MASTER_USER='replica', MASTER_PASSWORD='replicA&20', MASTER_LOG_FILE='$var1', MASTER_LOG_POS=$var2, GET_MASTER_PUBLIC_KEY = 1;"
 mysql -e "START SLAVE;"
 chmod 755 /home/vovzila/nginx-sql_slave/cronboot
+cp /home/vovzila/nginx-sql_slave/crontab /etc/crontab
 cp /home/vovzila/nginx-sql_slave/default /etc/nginx/sites-available/default
 wait
 cp /home/vovzila/nginx-sql_slave/fileshare /etc/nginx/sites-available/fileshare
