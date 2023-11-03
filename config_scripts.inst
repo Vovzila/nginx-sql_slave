@@ -44,3 +44,9 @@ systemctl start node_exporter
 systemctl enable node_exporter
 rm -r node_exporter-1.6.1.linux-amd64
 rm node_exporter-1.6.1.linux-amd64.tar.gz
+dpkg -i /mnt/windir/project/filebeat-8.9.1-amd64.deb
+wait
+cp /home/vovzila/nginx-sql_slave/filebeat.yml /etc/filebeat/filebeat.yml
+wait
+systemctl enable filebeat
+systemctl restart filebeat
