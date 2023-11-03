@@ -53,7 +53,7 @@ filebeat.inputs:
 
   # Unique ID among all inputs, an ID is required.
   id: mysql-id
-  tags: ["Mysql-server"]
+  tags: ["Mysql-slave-server"]
   # Change to true to enable this input configuration.
   enabled: true
 
