@@ -1,52 +1,91 @@
+#Настройка переменной имя для Git
 git config --global user.name Vovzila
+#Настройка переменной Email для Git
 git config --global user.email vovzila@mail.ru
+#Клонирование необходимых для восстановления файло из репозитория GitHub
 git clone https://vovzila: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@github.com/Vovzila/nginx-sql_slave.git
+#копирование конфигов NTP
 cp /home/vovzila/nginx-sql_slave/timesyncd.conf /etc/systemd/timesyncd.conf
 wait
+#перезапуск службы синхронизации времени (необходима для корректного подклбчения к домену, т.к. в роли ntp выступает контроллер AD)
 systemctl restart systemd-timesyncd
+#Создание директории, в которую будет подключаться общий ресурс из существующей инфрастуктуры с авторизацией через AD
 mkdir /mnt/windir
 wait
+#Конфиговский файл с описанием окружения при подключении к домену
 cp /home/vovzila/nginx-sql_slave/realmd.conf /etc/realmd.conf
+#Ввод в домен
 echo ubuntu321 | realm join -U ubuntu bis.vrn.ru
+#Таймаут в 10 секунд для успешной отработки контроллера домена
 sleep 10
+#Подключение к общему ресурсу
 mount.cifs //192.168.100.3/"Общая шара" /mnt/windir -o username=ubuntu,password=ubuntu321
+#Таймаут в 10 секунд для успешной отработки подключения к общему ресурсу
 sleep 10
+#Подмена заготовленного конфига
 cp /home/vovzila/nginx-sql_slave/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
+#перезапуск mysql
 systemctl restart mysql
+#Чтение переменных из файлов на общем ресурсе
 var1=$(head /mnt/windir/binlog)
 var2=$(head /mnt/windir/position)
+#остановка slave
 mysql -e "STOP SLAVE;"
+#подключение к Master серверу mysql
 mysql -e "CHANGE MASTER TO MASTER_HOST='192.168.100.199', MASTER_USER='replica', MASTER_PASSWORD='replicA&20', MASTER_LOG_FILE='$var1', MASTER_LOG_POS=$var2, GET_MASTER_PUBLIC_KEY = 1;"
+#запуск репликации
 mysql -e "START SLAVE;"
+#назначение прав файлу, исполняему из crontab
 chmod 755 /home/vovzila/nginx-sql_slave/cronboot
+#восттановление заданий cron
 cp /home/vovzila/nginx-sql_slave/crontab /etc/crontab
+#шаблон nginx для балансировки
 cp /home/vovzila/nginx-sql_slave/default /etc/nginx/sites-available/default
 wait
+#шаблон nginx для файлсервера
 cp /home/vovzila/nginx-sql_slave/fileshare /etc/nginx/sites-available/fileshare
 wait
+#софтлинк для файлсервера
 ln -s /etc/nginx/sites-available/fileshare /etc/nginx/sites-enabled/fileshare
 wait
+#перезапуск демона nginx
 systemctl restart nginx
+#переход
 cd /home/vovzila/nginx-sql_slave/
 wait
+#Копирование с общего ресурса архива с node_exporter
 cp /mnt/windir/project/node_exporter-1.6.1.linux-amd64.tar.gz /home/vovzila/nginx-sql_slave/node_exporter-1.6.1.linux-amd64.tar.gz
 wait
+#Разархивация node_exporter
 tar xzvf node_exporter-*.t*gz
 wait
+#создание пользователя для node_exporter
 useradd --no-create-home --shell /bin/false node_exporter
+#копирование файлов node_exporter в конечную директорию
 cp node_exporter-*.linux-amd64/node_exporter /usr/local/bin
 wait
+#изменение владельца файлов node_exporter
 chown node_exporter: /usr/local/bin/node_exporter
+#Копирование файла демона node_exporter
 cp /home/vovzila/nginx-sql_slave/node_exporter.service /etc/systemd/system/node_exporter.service
 wait
+#перезагрузка списка демонов
 systemctl daemon-reload
+#запуск демона node_exporter
 systemctl start node_exporter
+#добавление демона node_exporter в автозапуск при загрузке
 systemctl enable node_exporter
+#удаление времнных файлов
 rm -r node_exporter-1.6.1.linux-amd64
 rm node_exporter-1.6.1.linux-amd64.tar.gz
+#Установка пакета filebeat
 dpkg -i /mnt/windir/project/filebeat-8.9.1-amd64.deb
 wait
+#настройки filebeat
 cp /home/vovzila/nginx-sql_slave/filebeat.yml /etc/filebeat/filebeat.yml
 wait
+#filebeat в автозагрузку
 systemctl enable filebeat
+#перезапуск filebeat
 systemctl restart filebeat
+chmod 755 /home/vovzila/nginx-sql_slave/bd_backup 

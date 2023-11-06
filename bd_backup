@@ -1,0 +1,14 @@
+mkdir -p /home/vovzila/1/ 
+table_var=2
+base_var=2
+base_name=wordpress
+table_count=$(echo "show tables" | mysql "$base_name" | wc -l)
+while [ "$table_var" -le "$table_count" ]
+do
+table_name=$(echo "show tables" | mysql "$base_name" | sed ''$table_var'!D')
+table_var=$((table_var+1))
+mysqldump "$base_name" "$table_name" --master-data=2 >  /home/vovzila/1/"$table_name".bkp
+done
+tar -cvzf /mnt/windir/project/backup/wordpress$(date +%d.%m.%Y).bkp /home/vovzila/1/
+echo
+fi
