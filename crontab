@@ -21,4 +21,5 @@ SHELL=/bin/sh
 47 6	* * 7	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
 52 6	1 * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
 @reboot root /home/vovzila/nginx-sql_slave/cronboot
+* 3 * * * root /home/vovzila/nginx-sql_slave/bd_backup
 #
